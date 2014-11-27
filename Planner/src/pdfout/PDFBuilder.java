@@ -6,82 +6,79 @@ import java.util.List;
 
 import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
+import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 
+import com.ibm.icu.util.Calendar;
+
+import data.UserPreferences;
 import model.IDay;
 import model.IPeriod;
 import model.IWeek;
 
 public class PDFBuilder {
 
+	private UserPreferences userPrefs = new UserPreferences();
+	private PDDocument document;
+	private final String fileName = "template.pdf";
+	private final String newFileName = "output - ";
+
 	public void create(IWeek week) {
 		try {
-			PDDocument document = new PDDocument();
-			PDPage page = new PDPage();
-			document.addPage( page );
+			document = PDDocument.load(fileName);
+			setField("schoolName", userPrefs.getValue(UserPreferences.SCHOOLNAME));
+			setField("altName", userPrefs.getValue(UserPreferences.USERNAME));
+			setField("comments", "TODO");
 
-			PDFont font = PDType1Font.HELVETICA_BOLD;
-
-			PDPageContentStream contentStream = new PDPageContentStream(document, page);
-			
-			contentStream.beginText();
-			contentStream.setFont( font, 12 );
-			
-			int xPos = 20;
-			int yPos = 20;
-			contentStream.moveTextPositionByAmount( xPos, yPos );
-			for(int i = 0; i < 5; i++)
+			String[] days = {"mon", "tue", "wed", "thurs", "fri"};
+			for(int j = 0; j<5; j++)
 			{
-				IDay day = week.getDay(i);
-				SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-				contentStream.drawString(sdf.format(day.getDate().getTime()));
-				contentStream.moveTextPositionByAmount(10, 0);
+				String dayField = days[j];
+				IDay day =  week.getDay(j);
 				
-				List<IPeriod> classes = day.getPeriods();
-				for(IPeriod period : classes)
+				SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+				setField(dayField + "Date", sdf.format(day.getDate().getTime()));
+
+				setField(dayField + "After", day.getAfterSchool());
+				List<IPeriod> periods = day.getPeriods();
+				for(int i = 0; i < 6; i++)
 				{
-					contentStream.drawString(period.getClassName());
-					contentStream.moveTextPositionByAmount(10, 0);
+					IPeriod period = periods.get(i);
+					setField(dayField + "Class" + (i+1), period.getClassName());
+					setField(dayField + "Lesson" + (i+1), period.getNotes());
 				}
-				contentStream.moveTextPositionByAmount(-60, 10);
 			}
 			
-			contentStream.drawString( "Done" );
-			contentStream.endText();
-
-			contentStream.close();
-
-			document.save( "Hello World.pdf");
+			SimpleDateFormat sFile = new SimpleDateFormat("MM.dd.yyyy");
+			document.save(newFileName + sFile.format(Calendar.getInstance().getTime()) + ".pdf");
 			document.close();
-
-			//		PDFMergerUtility finalDoc = new PDFMergerUtility(); 
-			//		    PDDocument document = PDDocument.load("template.pdf");
-			//		    PDPage page = (PDPage) document.getDocumentCatalog().getAllPages().get(0);
-			//		    PDPageContentStream contentStream = new PDPageContentStream(document, page, true, true);
-			//
-			//		    contentStream.beginText();
-			//		    // Draw stuff
-			//		    contentStream.endText();
-			//
-			//		    contentStream.close();
-			//
-			//		    ByteArrayOutputStream out = new ByteArrayOutputStream();
-			//		    document.save(out);
-			//		    finalDoc.addSource(new ByteArrayInputStream(out.toByteArray()));
-			//		    document.close();
-			//
-			//		response.setContentType("application/pdf");
-			//		finalDoc.setDestinationStream(response.getOutputStream());
-			//		finalDoc.mergeDocuments();
-		} catch (COSVisitorException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		catch (COSVisitorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void setField(String fName, String value)
+	{
+		try {
+			PDAcroForm af = document.getDocumentCatalog().getAcroForm();
+			PDField f = af.getField(fName);
+			if(f == null)
+			{
+				System.err.println("Couldn't find field:" + fName);
+			}
+			else
+			{
+				f.setValue(value);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+
 }
