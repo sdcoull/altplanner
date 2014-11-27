@@ -16,6 +16,11 @@ public class Day implements IDay, Serializable {
 	public Day(Calendar date)
 	{
 		this.date = date;
+		for(int i = 0; i < 6; i++)
+		{
+			IPeriod period = new Period(i, "", "", "");
+			periods.add(period);
+		}
 	}
 
 	@Override
@@ -35,10 +40,6 @@ public class Day implements IDay, Serializable {
 				return;
 			}
 		}
-			
-		IPeriod period = new Period(periodNum, className, notes, feeling);
-		periods.add(period);
-		
 	}
 
 	@Override
