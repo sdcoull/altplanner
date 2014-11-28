@@ -16,7 +16,7 @@ public class WeekSystem {
 	IWeek week;
 	IDay day;
 	
-	public void addPeriod(int periodNum, String className, String notes, String feeling) throws IOException
+	public void addPeriod(int periodNum, String className, String notes, String feeling) throws IOException, ClassNotFoundException
 	{
 		day.addPeriod(periodNum, className, notes, feeling);
 	}
@@ -26,7 +26,7 @@ public class WeekSystem {
 		return day.getPeriods();
 	}
 
-	public void save() throws IOException {
+	public void save() throws IOException, ClassNotFoundException {
 		SaveLoad save = new SaveLoad();
 		save.saveWeek(week);
 	}
