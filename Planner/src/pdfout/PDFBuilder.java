@@ -25,23 +25,27 @@ public class PDFBuilder {
 
 	public void create(IWeek week) {
 		try {
+			System.out.println("Starting..");
 			document = PDDocument.load(fileName);
+			System.out.println("Loaded Template..");
 			setField("schoolName", userPrefs.getValue(UserPreferences.SCHOOLNAME));
 			setField("altName", userPrefs.getValue(UserPreferences.USERNAME));
-			setField("comments", "TODO");
+			//setField("comments", "TODO");
+			System.out.println("Added user fields..");
 
 			String[] days = {"mon", "tue", "wed", "thurs", "fri"};
 			for(int j = 0; j<5; j++)
 			{
 				String dayField = days[j];
+				System.out.println("Adding " + dayField);
 				IDay day =  week.getDay(j);
 				
 				SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 				setField(dayField + "Date", sdf.format(day.getDate().getTime()));
 
-				setField(dayField + "After", day.getAfterSchool());
+				setField(dayField + "After", day.getAfterSchool() + "/n");
 				List<IPeriod> periods = day.getPeriods();
-				for(int i = 0; i < 6; i++)
+				for(int i = 0; i < periods.size(); i++)
 				{
 					IPeriod period = periods.get(i);
 					setField(dayField + "Class" + (i+1), period.getClassName());

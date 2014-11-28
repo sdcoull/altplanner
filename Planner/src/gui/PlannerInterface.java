@@ -172,8 +172,9 @@ public class PlannerInterface extends Composite {
 		btnCreatePdf.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				daySystem.createPDF();
+			public void widgetSelected(SelectionEvent e) {	
+					save();
+					daySystem.createPDF();
 			}
 		});
 		
@@ -244,6 +245,7 @@ public class PlannerInterface extends Composite {
 			daySystem.addLunchClass(textLunchClass.getText());
 			daySystem.addCleaningClass(textCleaningClass.getText());
 			daySystem.addAfterSchool(textAfterSchool.getText());
+			daySystem.save();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

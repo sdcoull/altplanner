@@ -6,6 +6,7 @@ import java.util.List;
 
 import pdfout.PDFBuilder;
 import data.SaveLoad;
+import model.IDay;
 import model.IPeriod;
 import model.IWeek;
 import model.Week;
@@ -13,17 +14,16 @@ import model.Week;
 public class WeekSystem {
 
 	IWeek week;
-	int day = 0;
+	IDay day;
 	
 	public void addPeriod(int periodNum, String className, String notes, String feeling) throws IOException
 	{
-		week.getDay(day).addPeriod(periodNum, className, notes, feeling);
-		save();
+		day.addPeriod(periodNum, className, notes, feeling);
 	}
 	
 	public List<IPeriod> getDay()
 	{
-		return week.getDay(day).getPeriods();
+		return day.getPeriods();
 	}
 
 	public void save() throws IOException {
@@ -45,7 +45,7 @@ public class WeekSystem {
 	
 	public String getClassName(int period)
 	{
-		List<IPeriod> p = week.getDay(day).getPeriods();
+		List<IPeriod> p = day.getPeriods();
 		for(IPeriod ps : p)
 		{
 			if(ps.getPeriodNumber() == period)
@@ -55,7 +55,7 @@ public class WeekSystem {
 	}
 
 	public String getClassText(int period) {
-		List<IPeriod> p = week.getDay(day).getPeriods();
+		List<IPeriod> p = day.getPeriods();
 		for(IPeriod ps : p)
 		{
 			if(ps.getPeriodNumber() == period)
@@ -67,61 +67,60 @@ public class WeekSystem {
 	public void loadDay(String selection) {
 		if(selection.equals("Monday"))
 		{
-			day = 0;
+			day = week.getDay(0);
 		}
 		else if(selection.equals("Tuesday"))
 		{
-			day = 1;
+			day = week.getDay(1);
 		}
 		else if(selection.equals("Wednesday"))
 		{
-			day = 2;
+			day = week.getDay(2);
 		}
 		else if(selection.equals("Thursday"))
 		{
-			day = 3;
+			day = week.getDay(3);
 		}
 		else
 		{
-			day = 4;
+			day = week.getDay(4);
 		}
 	}
 
 	public Calendar getDate() {
-		return week.getDay(day).getDate();
+		return day.getDate();
 	}
 
 	public void addLunchClass(String text) {
-		week.getDay(day).setLunchClass(text);
+		day.setLunchClass(text);
 	}
 
 	public void addCleaningClass(String text) {
-		week.getDay(day).setCleaningClass(text);
+		day.setCleaningClass(text);
 	}
 
 	public void addAfterSchool(String text) {
-		week.getDay(day).setAfterSchool(text);
+		day.setAfterSchool(text);
 	}
 	
 	public String getLunchClass()
 	{
-		return week.getDay(day).getLunchClass();
+		return day.getLunchClass();
 	}
 	
 	public String getCleaningClass()
 	{
-		return week.getDay(day).getCleaningClass();
+		return day.getCleaningClass();
 	}
 	
 	public String getAfterSchool()
 	{
-		return week.getDay(day).getAfterSchool();
+		return day.getAfterSchool();
 	}
 
 	public void createPDF() {
 		PDFBuilder builder = new PDFBuilder();
 		builder.create(week);
-		
 	}
 	
 }
